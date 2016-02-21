@@ -180,12 +180,21 @@ def _draw_test(fig, ax, size, color, bgcolor, exam, p):
 
 def snellen_game(startsize='20/40', timer=15, p=7./9, exam=False):
     """
-    Play game that simulates eye exam. Type in a string tha tyou think matches that shown and hit enter. Size is
-    adjusted according to whether you get greater than fraction p correct. Game runs until timer ends.
+    Play game that simulates eye exam.
+
+    Play by typing the letters you think you see on the screen and hitting enter. Incorrect guesses will be
+    highlghted in red, correct ones in green. You can continue guessing the letters until you get them all correct or
+    hit enter to progress to the next round. Size is adjusted according to whether you guessed greater than a fraction
+    p of the letters correctly on the first try. The game runs until the timer expires or user types 'q'.
+
+    In exam mode, correct and incorrect letters are not highlighted. Instead, each guess begins a new round. The game
+    is continued until the size of text at which the user can correctly guess, on average, a fraction p of the
+    letters has been narrowed down to a relative precision specified by the exam keyword.
 
     :param startsize: starting size either as visual measurement (e.g. 20/60) or size in points
     :param timer: timer length in min
     :param p: fraction you must get correct for size of next line to be reduced
+    :param exam: the relative precision desired for an exam. initiates exam instead of timer mode.
     :return: none
     """
 
@@ -228,10 +237,20 @@ def snellen_contrast_game(start_contrast=32, size=10.0, timer=15, p=7./9, exam=F
     """
     Practice contrast sensitivity using Snellen letters with gray letters on gray background.
 
+    Play by typing the letters you think you see on the screen and hitting enter. Incorrect guesses will be
+    highlghted in red, correct ones in green. You can continue guessing the letters until you get them all correct or
+    hit enter to progress to the next round. Contrast is adjusted according to whether you guessed greater than a
+    fraction  p of the letters correctly on the first try. The game runs until the timer expires or user types 'q'.
+
+    In exam mode, correct and incorrect letters are not highlighted. Instead, each guess begins a new round. The game
+    is continued until the contrast at which the user can correctly guess, on average, a fraction p of the letters has
+    been narrowed down to a relative precision specified by the exam keyword.
+
     :param start_contrast: contrast of letters from background, 0-256
     :param size: text size in points (1/72 in.)
     :param timer: timer for length of game
     :param p: fraction of letters user must guess correctly to pass a given line
+    :param exam: the relative precision desired for an exam. initiates exam instead of timer mode.
     :return: none
     """
 
