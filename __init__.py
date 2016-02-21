@@ -7,6 +7,8 @@ import time
 _plt.ion()
 _text_ratio = 0.708 # ratio of capital letter height to font size for standard matplotlib font
 _height_text_2020 = _np.pi/180.*(5./60.)*(20.*12.*72.) # height of text person with 20/20 vision can see in pts
+_step_grow = 1.1
+_step_shrink = 0.8
 
 # get physical screen size
 use_default = raw_input("Use default screen size of 15.4\" (standard size of 2015 Macbook Pro 15\")?")
@@ -187,7 +189,7 @@ def snellen_game(startsize='20/40', timer=15, p=7./9, exam=False):
     :return: none
     """
 
-    factor = 2.0
+    size_step = startsize/10.
 
     fig, ax = _setup_figure()
 
@@ -198,25 +200,26 @@ def snellen_game(startsize='20/40', timer=15, p=7./9, exam=False):
     _passed = True
     record = []
     while True:
-        record.append(size)
-        if (time.time() - tstart)/60. > timer:
-            print "\nout of time."
+
+        if exam:
+            relative_accuracy = size_step/size
+            if relative_accuracy < exam:
+                print '\nResolution measured to be {} to a precision of {:.2g}%.'.format(sizestr, 100*exam)
+                break
+        elif (time.time() - tstart)/60. > timer:
+            print "\nOut of time."
             break
 
         sizestr = _size2actuity(size) if msmt_type == 'visual' else '{:.3g}'.format(size)
         print 'size = {}'.format(sizestr)
         passed = _draw_test(fig, ax, size, color='k', bgcolor='w', exam=exam, p=p)
 
-        size = size/factor if passed else size*factor
-
-        if passed != _passed:
-            factor = (factor - 1.0)*0.8 + 1.0
+        size = size - size_step if passed else size + size_step
+        size_step = size_step * _step_grow if passed == _passed else size_step * _step_shrink
         _passed = passed
 
     n = 10
     avg = sum(record[-n:])/float(n)
-    avgstr = _size2actuity(avg) if msmt_type == 'visual' else '{:.3g}'.format(size)
-    print '\nAverage of last {} measurements = {}'.format(n, avgstr)
 
     _plt.close(fig)
 
@@ -244,7 +247,13 @@ def snellen_contrast_game(start_contrast=32, size=10.0, timer=15, p=7./9, exam=F
     while True:
         record.append(contrast)
 
-        if (time.time() - tstart)/60. > timer:
+        if exam:
+            precision = float(contrast_step)/contrast
+            if precision < exam or contrast_step == 1:
+                print ('\nContrast threshold measured to be {}/256 to a precision of {:.2g}%.'
+                       ''.format(contrast, 100*precision))
+                break
+        elif (time.time() - tstart)/60. > timer:
             print "\nOut of time."
             break
 
@@ -261,13 +270,13 @@ def snellen_contrast_game(start_contrast=32, size=10.0, timer=15, p=7./9, exam=F
 
         _contrast = contrast
         istep = round(contrast_step)
+
         contrast = contrast - istep if passed else contrast + istep
         if contrast > 256: contrast = 256
         if contrast < 1: contrast = 1
+        contrast_step = contrast_step*_step_grow if passed == _passed else contrast_step*_step_shrink
+        if contrast_step < 1: contrast_step = 1
 
-        if passed != _passed:
-             contrast_step = contrast_step * 0.8
-        if contrast_step == 0: contrast_step = 1
 
         if passed and _passed and _contrast == 1:
             print "Smallest posible contrast reached. Reducing text size instead and resetting start contrast."
