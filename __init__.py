@@ -22,8 +22,8 @@ use_default = raw_input("Use default screen size of 1440x900 (standard resolutio
 if 'y' in use_default or '' == use_default:
     _width_screen_pixels, _height_screen_pixels = 1440., 900.
 else:
-    res = float(raw_input("Enter screen resolution (pixels) as WxH: "))
-    res = res.split('x')
+    res = raw_input("Enter screen resolution (pixels) as WxH: ")
+    res = map(float, res.split('x'))
     _width_screen_pixels, _height_screen_pixels = map(float, res)
 _ar = _height_screen_pixels/_width_screen_pixels # screen aspect ratio
 
